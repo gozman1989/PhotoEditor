@@ -26,11 +26,31 @@
         android:text="@string/choose_photo"
         android:onClick="choosePhoto"/>
 
-    <ImageView
-        android:id="@+id/photoContainer"
+
+
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxWidth="90px"
-        android:maxHeight="90px"/>
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/photoContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="90px"
+            android:maxHeight="90px"
+            android:layout_centerHorizontal="true"/>
+
+      <!--  <Button
+            android:id="@+id/image_crop_form"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="30dp"
+            android:background="@drawable/image_capture"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            />-->
+
+    </RelativeLayout>
 
 </LinearLayout>

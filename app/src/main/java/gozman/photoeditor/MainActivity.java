@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,9 +58,15 @@ public class MainActivity extends Activity {
        /* Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image*//*");
         startActivityForResult(photoPickerIntent, SELECT_PHOTO);*/
-        Bitmap bitmap = BitmapFactory.decodeFile("/sdcard/bigbang_29093000.jpg");
+
+        String files[]=Environment.getExternalStorageDirectory().list();
+        Log.d("Goz", "files="+files);
+        Bitmap bitmap = BitmapFactory.decodeFile("/sdcard/Download/Desert.jpg");
         ImageView imageView= (ImageView) this.findViewById(R.id.photoContainer);
         imageView.setImageBitmap(bitmap);
+
+        Button button= (Button) this.findViewById(R.id.image_crop_form);
+        button.setVisibility(View.VISIBLE);
     }
 
     @Override
