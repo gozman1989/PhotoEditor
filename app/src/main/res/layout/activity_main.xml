@@ -1,13 +1,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical"
-    android:background="@color/lazy_pink"
-    android:weightSum="1">
+    android:background="@color/lazy_pink">
 
     <TextView android:text="@string/app_name"
         android:layout_width="wrap_content"
@@ -26,37 +22,49 @@
         android:text="@string/choose_photo"
         android:onClick="choosePhoto"/>
 
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New CheckBox"
-        android:id="@+id/checkBox"
-        android:layout_gravity="right" />
-
     <RelativeLayout
+        android:id="@+id/crop_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+
 
         <ImageView
             android:id="@+id/photoContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="90px"
-            android:maxHeight="90px"
-            android:src="@mipmap/koala"
-            android:background="@drawable/pic_border"/>
+            android:alpha="0.40"
+            android:src="@mipmap/koala"/>
 
-        <Button
-            android:id="@+id/image_crop_form"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="30dp"
-            android:background="@drawable/image_capture"
-            android:layout_gravity="center_horizontal"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            <RelativeLayout
+                android:id="@+id/crop_loop"
+                android:layout_width="80dp"
+                android:layout_height="80dp">
 
+                <ImageView
+                    android:id="@+id/crop_logo_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="matrix"
+                    android:src="@mipmap/koala"
+                    android:layout_gravity="center" />
+
+
+            </RelativeLayout>
     </RelativeLayout>
 
+    <Button
+        android:id="@+id/crop_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="@dimen/h1"
+        android:text="@string/crop_photo"
+        android:onClick="cropImage"/>
+
+
+        <ImageView
+            android:id="@+id/cropped_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
 </LinearLayout>
