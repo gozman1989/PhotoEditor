@@ -14,7 +14,6 @@
         />
 
     <Button
-        android:id="@+id/choosePhotoBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -22,26 +21,26 @@
         android:text="@string/choose_photo"
         android:onClick="choosePhoto"/>
 
-    <RelativeLayout
-        android:id="@+id/crop_container"
+    <FrameLayout
+        android:id="@+id/cropping_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
 
         <ImageView
-            android:id="@+id/photoContainer"
+            android:id="@+id/background_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:alpha="0.40"
             android:src="@mipmap/koala"/>
 
-            <RelativeLayout
-                android:id="@+id/crop_loop"
+            <FrameLayout
+                android:id="@+id/crop_selection_container"
                 android:layout_width="80dp"
                 android:layout_height="80dp">
 
                 <ImageView
-                    android:id="@+id/crop_logo_img"
+                    android:id="@+id/crop_selection"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:scaleType="matrix"
@@ -49,8 +48,8 @@
                     android:layout_gravity="center" />
 
 
-            </RelativeLayout>
-    </RelativeLayout>
+            </FrameLayout>
+    </FrameLayout>
 
     <Button
         android:id="@+id/crop_btn"

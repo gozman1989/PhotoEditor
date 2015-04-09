@@ -26,7 +26,13 @@ public class MainActivity extends Activity {
 
     private static final int SELECT_PHOTO = 100;
 
-    private ImageView mPhotoContainer;
+    private FrameLayout mCroppingContainer;
+
+    private FrameLayout mCropSelectionContainer;
+
+    private ImageView mBackgroundPhoto;
+
+    private ImageView mCropSelection;
 
 
     @Override
@@ -39,24 +45,24 @@ public class MainActivity extends Activity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
-        this.mPhotoContainer= (ImageView) this.findViewById(R.id.photoContainer);
-        ImageView cropLoopImg=(ImageView) findViewById(R.id.crop_logo_img);
+        mBackgroundPhoto= (ImageView) this.findViewById(R.id.background_photo);
+        mCropSelection=(ImageView) findViewById(R.id.crop_selection);
 
-        cropLoopImg.getLayoutParams().height=mPhotoContainer.getLayoutParams().height;
-        cropLoopImg.getLayoutParams().width=mPhotoContainer.getLayoutParams().width;
+        setCropSelectionDimensions();
 
-        RelativeLayout croopLoop=(RelativeLayout) findViewById(R.id.crop_loop);
-        RelativeLayout cropContainer=(RelativeLayout) findViewById(R.id.crop_container);
-        cropContainer.setOnTouchListener(new MyTouchListener(croopLoop, cropContainer));
+        mCroppingContainer= (FrameLayout) findViewById(R.id.cropping_container);
+        mCropSelectionContainer=(FrameLayout) findViewById(R.id.crop_selection_container);
+
+        mCroppingContainer.setOnTouchListener(new MyTouchListener(mCropSelectionContainer, mCropSelection, mCroppingContainer));
     }
 
     private class MyTouchListener implements View.OnTouchListener{
 
-        private RelativeLayout relativeLayout;
+        private FrameLayout mCropSelectionContainer;
 
-        private ImageView imageView;
+        private ImageView mCropSelection;
 
-        private RelativeLayout.LayoutParams containerParams;
+        private FrameLayout.LayoutParams containerParams;
 
         private int  maxLeft=0 ;
 
@@ -66,12 +72,12 @@ public class MainActivity extends Activity {
 
         private int xStart, yStart;
 
-        public  MyTouchListener(RelativeLayout frameLayout, RelativeLayout cropContainer){
-            this.relativeLayout=frameLayout;
-            this.imageView= (ImageView) frameLayout.findViewById(R.id.crop_logo_img);
-            containerParams= (RelativeLayout.LayoutParams) frameLayout.getLayoutParams();
-            maxLeft=cropContainer.getWidth()-imageView.getWidth();
-            maxTop=cropContainer.getHeight()-imageView.getHeight();
+        public  MyTouchListener(FrameLayout mCropSelectionContainer, ImageView mCropSelection, FrameLayout mCroppingContainer){
+            this.mCropSelectionContainer=mCropSelectionContainer;
+            this.mCropSelection=mCropSelection;
+            containerParams= (FrameLayout.LayoutParams) mCropSelectionContainer.getLayoutParams();
+            maxLeft=mCroppingContainer.getWidth()-mCropSelection.getWidth();
+            maxTop=mCroppingContainer.getHeight()-mCropSelection.getHeight();
             Log.d(TAG, "MyTouchListener::() windowwidth="+maxLeft+" windowheight="+maxTop);
         }
 
@@ -107,8 +113,8 @@ public class MainActivity extends Activity {
                     Log.d(TAG, "x_cord="+x_cord+" y_cord="+y_cord);
                     containerParams.leftMargin = x_cord ;
                     containerParams.topMargin = y_cord;
-                    relativeLayout.setLayoutParams(containerParams);
-                    imageView.scrollTo(x_cord, y_cord);
+                    mCropSelectionContainer.setLayoutParams(containerParams);
+                    mCropSelection.scrollTo(x_cord, y_cord);
                     break;
                 default:
                     break;
@@ -117,31 +123,37 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void setCropSelectionDimensions(){
+        mCropSelection.getLayoutParams().height=mBackgroundPhoto.getLayoutParams().height;
+        mCropSelection.getLayoutParams().width=mBackgroundPhoto.getLayoutParams().width;
+    }
+
     public void choosePhoto(View view){
-       /* Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image*//*");
+        /*Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image");
         startActivityForResult(photoPickerIntent, SELECT_PHOTO);*/
 
         String files[]=Environment.getExternalStorageDirectory().list();
         Log.d("Goz", "files="+files);
         Bitmap bitmap = BitmapFactory.decodeFile("/sdcard/Download/Desert.jpg");
-        ImageView imageView= (ImageView) this.findViewById(R.id.photoContainer);
-        imageView.setImageBitmap(bitmap);
+        changePhoto(bitmap);
 
-        Button button= (Button) this.findViewById(R.id.choosePhotoBtn);
-        button.setVisibility(View.VISIBLE);
+    }
+
+    private void changePhoto(Bitmap bitmap){
+        mBackgroundPhoto.setImageBitmap(bitmap);
+        mCropSelection.setImageBitmap(bitmap);
     }
 
     public void cropImage(View view){
-        RelativeLayout croopLoop=(RelativeLayout) findViewById(R.id.crop_loop);
-        RelativeLayout.LayoutParams containerParams= (RelativeLayout.LayoutParams) croopLoop.getLayoutParams();
+
+        FrameLayout.LayoutParams containerParams= (FrameLayout.LayoutParams) mCropSelectionContainer.getLayoutParams();
         ImageView croppedImg=(ImageView) findViewById(R.id.cropped_img);
 
-        ImageView originalImage= (ImageView) findViewById(R.id.crop_logo_img);
         int left, top;
         left=containerParams.leftMargin;
         top=containerParams.topMargin;
-        Bitmap originalBitmap= ((BitmapDrawable)originalImage.getDrawable()).getBitmap();
+        Bitmap originalBitmap= ((BitmapDrawable)mBackgroundPhoto.getDrawable()).getBitmap();
         Bitmap croppedBmp = Bitmap.createBitmap(originalBitmap, left, top, containerParams.width, containerParams.height);
 
         croppedImg.setImageBitmap(croppedBmp);
@@ -159,8 +171,7 @@ public class MainActivity extends Activity {
                     try {
                         imageStream = getContentResolver().openInputStream(selectedImage);
                         Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
-                        ImageView imageView= (ImageView) this.findViewById(R.id.photoContainer);
-                        imageView.setImageBitmap(bitmap);
+                        changePhoto(bitmap);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
