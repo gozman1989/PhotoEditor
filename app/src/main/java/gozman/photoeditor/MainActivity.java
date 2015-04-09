@@ -12,11 +12,9 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -48,7 +46,7 @@ public class MainActivity extends Activity {
         mBackgroundPhoto= (ImageView) this.findViewById(R.id.background_photo);
         mCropSelection=(ImageView) findViewById(R.id.crop_selection);
 
-        setCropSelectionDimensions();
+
 
         mCroppingContainer= (FrameLayout) findViewById(R.id.cropping_container);
         mCropSelectionContainer=(FrameLayout) findViewById(R.id.crop_selection_container);
@@ -123,10 +121,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void setCropSelectionDimensions(){
-        mCropSelection.getLayoutParams().height=mBackgroundPhoto.getLayoutParams().height;
-        mCropSelection.getLayoutParams().width=mBackgroundPhoto.getLayoutParams().width;
-    }
 
     public void choosePhoto(View view){
         /*Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
@@ -135,14 +129,31 @@ public class MainActivity extends Activity {
 
         String files[]=Environment.getExternalStorageDirectory().list();
         Log.d("Goz", "files="+files);
-        Bitmap bitmap = BitmapFactory.decodeFile("/sdcard/Download/Desert.jpg");
+        Bitmap bitmap = BitmapFactory.decodeFile("/sdcard/Download/desert.jpg");
         changePhoto(bitmap);
 
     }
 
     private void changePhoto(Bitmap bitmap){
+
+
         mBackgroundPhoto.setImageBitmap(bitmap);
-        mCropSelection.setImageBitmap(bitmap);
+
+        ViewTreeObserver vto = mBackgroundPhoto.getViewTreeObserver();
+        vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            public boolean onPreDraw() {
+                mBackgroundPhoto.getViewTreeObserver().removeOnPreDrawListener(this);
+                int  finalHeight = mBackgroundPhoto.getMeasuredHeight();
+                int finalWidth = mBackgroundPhoto.getMeasuredWidth();
+                Log.d(TAG, "onPreDraw= finalHeight="+finalHeight+" finalWidth="+finalWidth);
+                Bitmap bitmap =((BitmapDrawable) mBackgroundPhoto.getDrawable()).getBitmap();
+               Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, finalWidth, finalHeight, true);
+                mCropSelection.setImageBitmap(scaledBitmap);
+                mCroppingContainer.setOnTouchListener(new MyTouchListener(mCropSelectionContainer, mCropSelection, mCroppingContainer));
+                return true;
+            }
+        });
+
     }
 
     public void cropImage(View view){
@@ -153,7 +164,7 @@ public class MainActivity extends Activity {
         int left, top;
         left=containerParams.leftMargin;
         top=containerParams.topMargin;
-        Bitmap originalBitmap= ((BitmapDrawable)mBackgroundPhoto.getDrawable()).getBitmap();
+        Bitmap originalBitmap= ((BitmapDrawable)mCropSelection.getDrawable()).getBitmap();
         Bitmap croppedBmp = Bitmap.createBitmap(originalBitmap, left, top, containerParams.width, containerParams.height);
 
         croppedImg.setImageBitmap(croppedBmp);
