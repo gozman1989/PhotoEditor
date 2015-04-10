@@ -1,73 +1,86 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<gozman.photoeditor.util.LockableScrollView
+    android:id="@+id/root_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/lazy_pink"
     tools:context=".MainActivity"
-    android:orientation="vertical"
-    android:background="@color/lazy_pink">
+  >
 
-    <TextView android:text="@string/app_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="@dimen/h1"
-        android:layout_marginBottom="20dp"
-        />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="@dimen/h2"
-        android:text="@string/choose_photo"
-        android:onClick="choosePhoto"/>
-
-    <FrameLayout
-        android:id="@+id/cropping_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
 
-        <ImageView
-            android:scaleType="centerCrop"
-            android:adjustViewBounds="true"
-            android:id="@+id/background_photo"
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:alpha="0.40"
-            android:padding="0dp"
-            android:layout_margin="0dp"
-            android:src="@mipmap/koala"/>
+            android:layout_gravity="center"
+            android:textSize="@dimen/h3"
+            android:text="@string/choose_photo"
+            android:onClick="choosePhoto"/>
 
-            <FrameLayout
-                android:id="@+id/crop_selection_container"
-                android:layout_width="80dp"
-                android:layout_height="80dp">
+        <FrameLayout
+            android:id="@+id/cropping_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <ImageView
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
+                android:id="@+id/background_photo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.40"
+                android:padding="0dp"
+                android:layout_margin="0dp"
+                android:src="@mipmap/koala"/>
+
+                <FrameLayout
+                    android:id="@+id/crop_selection_container"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp">
+
+                    <ImageView
+                        android:id="@+id/crop_selection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:scaleType="matrix"
+                        android:src="@mipmap/koala"
+                        android:layout_gravity="center" />
+
+
+                </FrameLayout>
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/crop_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="@dimen/h3"
+            android:text="@string/crop_photo"
+            android:onClick="cropImage"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
                 <ImageView
-                    android:id="@+id/crop_selection"
+                    android:id="@+id/cropped_img"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="matrix"
-                    android:src="@mipmap/koala"
-                    android:layout_gravity="center" />
+                    android:layout_gravity="center"/>
+        </ScrollView>
 
-
-            </FrameLayout>
-    </FrameLayout>
-
-    <Button
-        android:id="@+id/crop_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="@dimen/h1"
-        android:text="@string/crop_photo"
-        android:onClick="cropImage"/>
-
-
-        <ImageView
-            android:id="@+id/cropped_img"
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
-</LinearLayout>
+            android:padding="40dp">
+
+            </FrameLayout>
+    </LinearLayout>
+</gozman.photoeditor.util.LockableScrollView>

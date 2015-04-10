@@ -8,15 +8,19 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ScrollView;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
+import gozman.photoeditor.util.LockableScrollView;
 
 
 public class MainActivity extends Activity {
@@ -32,11 +36,15 @@ public class MainActivity extends Activity {
 
     private ImageView mCropSelection;
 
+    private LockableScrollView rootView;
+
+    private boolean mScrolling=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        rootView=(LockableScrollView)findViewById(R.id.root_container);
     }
 
     @Override
@@ -52,6 +60,14 @@ public class MainActivity extends Activity {
         mCropSelectionContainer=(FrameLayout) findViewById(R.id.crop_selection_container);
 
         mCroppingContainer.setOnTouchListener(new MyTouchListener(mCropSelectionContainer, mCropSelection, mCroppingContainer));
+    }
+
+    private boolean isScrolling() {
+        return mScrolling;
+    }
+
+    private void setScrolling(boolean mScrolling) {
+        this.mScrolling = mScrolling;
     }
 
     private class MyTouchListener implements View.OnTouchListener{
@@ -88,6 +104,7 @@ public class MainActivity extends Activity {
                     yDif=(int) event.getY();
                     xStart=containerParams.leftMargin;
                     yStart=containerParams.topMargin;
+                    rootView.setScrollingEnabled(false);
                     Log.d(TAG, "ACTION_DOWN xDif="+xDif+" yDif="+yDif+" xStart="+xStart+" yStart="+yStart);
                     break;
 
@@ -114,6 +131,11 @@ public class MainActivity extends Activity {
                     mCropSelectionContainer.setLayoutParams(containerParams);
                     mCropSelection.scrollTo(x_cord, y_cord);
                     break;
+
+                case MotionEvent.ACTION_UP:
+                    rootView.setScrollingEnabled(true);
+                    Log.d(TAG, "action up");
+                  break;
                 default:
                     break;
             };
@@ -123,14 +145,16 @@ public class MainActivity extends Activity {
 
 
     public void choosePhoto(View view){
-        /*Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image");
-        startActivityForResult(photoPickerIntent, SELECT_PHOTO);*/
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(intent, SELECT_PHOTO);
 
-        String files[]=Environment.getExternalStorageDirectory().list();
+      /*  String files[]=Environment.getExternalStorageDirectory().list();
         Log.d("Goz", "files="+files);
         Bitmap bitmap = BitmapFactory.decodeFile("/sdcard/Download/desert.jpg");
-        changePhoto(bitmap);
+        changePhoto(bitmap);*/
 
     }
 
@@ -165,6 +189,8 @@ public class MainActivity extends Activity {
         left=containerParams.leftMargin;
         top=containerParams.topMargin;
         Bitmap originalBitmap= ((BitmapDrawable)mCropSelection.getDrawable()).getBitmap();
+        Log.d(TAG, "contaier_width="+mCropSelectionContainer.getWidth()+" container_height="+mCropSelectionContainer.getHeight()+
+             "containerParams.width="+containerParams.width+" containerParams.height="+containerParams.height);
         Bitmap croppedBmp = Bitmap.createBitmap(originalBitmap, left, top, containerParams.width, containerParams.height);
 
         croppedImg.setImageBitmap(croppedBmp);
