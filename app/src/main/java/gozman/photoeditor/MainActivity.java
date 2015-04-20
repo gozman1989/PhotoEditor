@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -40,11 +41,17 @@ public class MainActivity extends Activity {
 
     private boolean mScrolling=true;
 
+    private ScaleGestureDetector mScaleDetector;
+
+    private ScaleListener scaleListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rootView=(LockableScrollView)findViewById(R.id.root_container);
+        scaleListener=new ScaleListener();
+        mScaleDetector=new ScaleGestureDetector(this, scaleListener);
     }
 
     @Override
@@ -68,6 +75,36 @@ public class MainActivity extends Activity {
 
     private void setScrolling(boolean mScrolling) {
         this.mScrolling = mScrolling;
+    }
+
+    private class ScaleListener
+            extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+
+        private float mScaleFactor = 1.f;
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            mScaleFactor *= detector.getScaleFactor();
+
+            // Don't let the object get too small or too large.
+            mScaleFactor = Math.max(1.f, Math.min(mScaleFactor, 2.0f));
+            Log.d(TAG, "scale="+mScaleFactor);
+
+            int width=mCroppingContainer.getWidth(), height=mCroppingContainer.getHeight();
+            width *=mScaleFactor;
+            height *=mScaleFactor;
+
+            FrameLayout.LayoutParams containerParams = (FrameLayout.LayoutParams) mCropSelectionContainer.getLayoutParams();
+            containerParams.width=width;
+            containerParams.height=height;
+            mCropSelectionContainer.setLayoutParams(containerParams);
+
+            return true;
+        }
+
+        public float getScaleFactor(){
+            return mScaleFactor;
+        }
     }
 
     private class MyTouchListener implements View.OnTouchListener{
@@ -97,6 +134,8 @@ public class MainActivity extends Activity {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+
+            mScaleDetector.onTouchEvent(event);
 
             switch (event.getActionMasked()){
                 case MotionEvent.ACTION_DOWN:
