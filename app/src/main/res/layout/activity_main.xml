@@ -65,22 +65,22 @@
             android:text="@string/crop_photo"
             android:onClick="cropImage"/>
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/cropped_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
 
-                <ImageView
-                    android:id="@+id/cropped_img"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"/>
-        </ScrollView>
-
-        <FrameLayout
+        <Button
+            android:id="@+id/save_photo_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            android:text="@string/save_photo"
+            android:onClick="saveCroppedPhoto"
             android:padding="40dp">
+         </Button>
 
-            </FrameLayout>
     </LinearLayout>
 </gozman.photoeditor.util.LockableScrollView>

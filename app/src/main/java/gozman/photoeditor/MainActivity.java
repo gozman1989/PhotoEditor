@@ -8,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -18,8 +20,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import gozman.photoeditor.util.LockableScrollView;
 
@@ -28,6 +34,8 @@ public class MainActivity extends Activity {
     public static final String TAG=MainActivity.class.getSimpleName();
 
     private static final int SELECT_PHOTO = 100;
+
+    private static final int REQUEST_TAKE_PHOTO = 99;
 
     private FrameLayout mCroppingContainer;
 
@@ -45,6 +53,8 @@ public class MainActivity extends Activity {
 
     private ScaleListener scaleListener;
 
+    private String mCurrentPhotoPath;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +70,8 @@ public class MainActivity extends Activity {
 
         mBackgroundPhoto= (ImageView) this.findViewById(R.id.background_photo);
         mCropSelection=(ImageView) findViewById(R.id.crop_selection);
-
+        Bitmap originalImg=((BitmapDrawable)mBackgroundPhoto.getDrawable()).getBitmap();
+        changePhoto(originalImg);
 
 
         mCroppingContainer= (FrameLayout) findViewById(R.id.cropping_container);
@@ -69,12 +80,41 @@ public class MainActivity extends Activity {
         mCroppingContainer.setOnTouchListener(new MyTouchListener(mCropSelectionContainer, mCropSelection, mCroppingContainer));
     }
 
-    private boolean isScrolling() {
-        return mScrolling;
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
     }
 
-    private void setScrolling(boolean mScrolling) {
-        this.mScrolling = mScrolling;
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
     }
 
     private class ScaleListener
@@ -189,12 +229,6 @@ public class MainActivity extends Activity {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         startActivityForResult(intent, SELECT_PHOTO);
-
-      /*  String files[]=Environment.getExternalStorageDirectory().list();
-        Log.d("Goz", "files="+files);
-        Bitmap bitmap = BitmapFactory.decodeFile("/sdcard/Download/desert.jpg");
-        changePhoto(bitmap);*/
-
     }
 
     private void changePhoto(Bitmap bitmap){
@@ -233,6 +267,13 @@ public class MainActivity extends Activity {
         Bitmap croppedBmp = Bitmap.createBitmap(originalBitmap, left, top, containerParams.width, containerParams.height);
 
         croppedImg.setImageBitmap(croppedBmp);
+
+        findViewById(R.id.save_photo_btn).setVisibility(View.VISIBLE);
+    }
+
+    public void saveCroppedPhoto(View view){
+        ImageView croppedImg=(ImageView) findViewById(R.id.cropped_img);
+        Bitmap croppedBmp=((BitmapDrawable)croppedImg.getDrawable()).getBitmap();
     }
 
     @Override

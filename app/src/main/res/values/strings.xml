@@ -7,4 +7,6 @@
     <string name="choose_photo">Choose Photo</string>
 
     <string name="crop_photo">Crop Photo!</string>
+    <string name="save_photo">Save Cropped Photo!</string>
+
 </resources>
